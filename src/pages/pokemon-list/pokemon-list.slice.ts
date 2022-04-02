@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { Pokemon, PokemonSpecies } from "../../common/pokemon.model"
+import { Pokemon, PokemonSummary } from "../../common/pokemon.model"
 import { AppThunk } from "../../redux/store"
 import PokemonListApi from "./pokemon-list.api"
 
@@ -7,7 +7,7 @@ interface PokemonListState {
   limit: number,
   offset: number,
   totalCount: number,
-  pokemons: Array<PokemonSpecies|Pokemon>,
+  pokemons: Array<PokemonSummary|Pokemon>,
   isLoading: boolean,
   error: string | null
 }
@@ -28,7 +28,7 @@ const slice = createSlice({
     startLoading: state => {
       state.isLoading = true
     },
-    setPokemons: (state, action: PayloadAction<Array<PokemonSpecies|Pokemon>>) => {
+    setPokemons: (state, action: PayloadAction<Array<PokemonSummary|Pokemon>>) => {
       state.pokemons = action.payload
       state.isLoading = false
     },
@@ -62,7 +62,7 @@ export const getPokemons = (): AppThunk => (dispatch, getStates) => {
     })
 }
 
-export const markCatchedPokemons = (): AppThunk<PokemonSpecies[] | Pokemon[]> => (dispatch, getStates) => {
+export const markCatchedPokemons = (): AppThunk<PokemonSummary[] | Pokemon[]> => (dispatch, getStates) => {
   
   return []
 }

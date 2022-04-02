@@ -1,4 +1,3 @@
-import { Url } from "url"
 
 export interface Pokemon {
   id: number,
@@ -19,53 +18,74 @@ export interface Pokemon {
   owned?: number
 }
 
-export interface PokemonSpecies {
+export interface PokemonSummary {
   name: string,
-  url: Url,
+  string: string,
   owned?: number
 }
 
-export interface PokemonForm {
+export interface PokemonSpecies {
+  id: number,
   name: string,
-  url: Url
+  base_happiness: number,
+  capture_rate: number,
+  color: PokemonSummary,
+  habitat: PokemonSummary,
+  has_gender_differences: boolean,
+  hatch_counter: number,
+  is_baby: boolean,
+  is_legendary: boolean,
+  is_mythical: boolean,
+  url?: string
 }
 
-export interface PokemonGameIndice {
+interface PokemonForm {
+  name: string,
+  string: string
+}
+
+interface PokemonGameIndice {
   game_index: number,
-  version: object,
+  version: any,
 }
 
-export interface PokemonMove {
+interface PokemonMove {
   move: object,
-  version_group_details: Array<object>
+  version_group_details: Array<any>
 }
 
-export interface PokemonAbility {
-  ability: object,
+interface PokemonAbility {
+  ability: any,
   is_hidden: boolean,
   slot: number
 }
 
-export interface PokemonSprites {
-  back_default: Url | null,
-  back_female: Url | null,
-  back_shiny: Url | null,
-  back_shiny_female: Url | null,
-  front_default: Url | null,
-  front_female: Url | null,
-  front_shiny: Url | null,
-  front_shiny_female: Url | null,
-  other: object,
-  versions: object
+interface PokemonSprites {
+  back_default: string | null,
+  back_female: string | null,
+  back_shiny: string | null,
+  back_shiny_female: string | null,
+  front_default: string | null,
+  front_female: string | null,
+  front_shiny: string | null,
+  front_shiny_female: string | null,
+  other: PokemonOtherSprites,
+  versions: any
 }
 
-export interface PokemonStat {
+interface PokemonOtherSprites {
+  dream_world: PokemonSprites,
+  home: PokemonSprites,
+  "official-art": PokemonSprites
+}
+
+interface PokemonStat {
   base_stat: number,
   effort: number,
-  stat: object
+  stat: any
 }
 
-export interface PokemonType {
+interface PokemonType {
   slot: number,
-  type: object
+  type: any
 }

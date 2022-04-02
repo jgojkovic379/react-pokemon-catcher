@@ -22,7 +22,7 @@ export function PokemonList(): JSX.Element {
   React.useEffect(() => {
     dispatch(setHasMenu(true))
     dispatch(setTitle("Let's catch wild pokemon"))
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   React.useEffect(() => {
     if (pokemons.length > 0) {
@@ -31,7 +31,7 @@ export function PokemonList(): JSX.Element {
       dispatch(setOffset(page * limit - limit))
       dispatch(getPokemons())
     }
-  }, [page])
+  }, [page]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Box  sx={{
@@ -45,8 +45,8 @@ export function PokemonList(): JSX.Element {
             </Box>
           :
             pokemons.length > 0 ?
-              <Box height="100%" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-                <Grid container spacing={2} marginBottom={2} marginTop={1}>
+              <Box height="max-content" py={1} minHeight="100%" display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+                <Grid container spacing={2} marginBottom={2}>
                   {
                     pokemons.map((pokemon, index: number) => 
                       <Grid item key={index} xs={6} sm={4}>
