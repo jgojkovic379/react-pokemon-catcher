@@ -51,7 +51,7 @@ export function PokemonDetail(): JSX.Element {
         setSnackbar({ isOpen: true, type: 'error', message: `Failed to capture ${pokemon?.name}. Try again!` })
       }     
       setIsCatchingLoading(false) 
-    }, 1000)
+    }, 1500)
   }
 
   const saveCaughtPokemon = () => {
@@ -158,7 +158,12 @@ export function PokemonDetail(): JSX.Element {
                             <CatchingPokemonIcon sx={{ mr: 1 }}/> Catch this Pokemon
                           </div>
                         :
-                          <CircularProgress color="inherit" />
+                          <div style={{ display: 'flex', zIndex: '1', textTransform: 'capitalize', justifyContent: 'center', alignItems: 'center'}}>
+                            <CircularProgress size={30} color="inherit" sx={{ mr: 1 }} />
+                            <span>
+                              { (pokemon?.species?.capture_rate / 255 * 100).toFixed(2) + '% success chance'}
+                            </span>
+                          </div>
                       }
                     </Fab>
                     
