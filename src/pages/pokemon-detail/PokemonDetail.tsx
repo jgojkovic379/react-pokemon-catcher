@@ -34,19 +34,24 @@ export function PokemonDetail(): JSX.Element {
   const [isCatchable, setIsCatchable] = React.useState<boolean>(true)
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
   const [pokemonNickname, setPokemonNickname] = React.useState<string>('')
+  const [isCatchingLoading, setIsCatchingLoading] = React.useState<boolean>(false)
 
   const catchPokemon = () => {
-    // 255 is the capture rate number. see https://pokeapi.co/docs/v2#pokemon-species
-    // if the capture rate doesn't exist, the capture rate value set to 127.5 (50%)
-    const catchNumber = Math.floor(Math.random() * 255)
-    const isCaught = catchNumber <= (pokemon?.species?.capture_rate || 127.5)
-    console.log(`Capture rate: ${pokemon?.species?.capture_rate} / 255 \nCatch number: ${catchNumber} \nPokemon will be captured if catch number <= ${pokemon?.species?.capture_rate}`)
-    if (isCaught) {
-      setSnackbar({ isOpen: true, type: 'success', message: `${pokemon?.name} is captured` })
-      setIsModalOpen(true)
-    } else {
-      setSnackbar({ isOpen: true, type: 'error', message: `Failed to capture ${pokemon?.name}. Try again!` })
-    }
+    setIsCatchingLoading(true)
+    setTimeout(() => {
+      // 255 is the capture rate number. see https://pokeapi.co/docs/v2#pokemon-species
+      // if the capture rate doesn't exist, the capture rate value set to 127.5 (50%)
+      const catchNumber = Math.floor(Math.random() * 255)
+      const isCaught = catchNumber <= (pokemon?.species?.capture_rate || 127.5)
+      console.log(`Capture rate: ${pokemon?.species?.capture_rate} / 255 \nCatch number: ${catchNumber} \nPokemon will be captured if catch number <= ${pokemon?.species?.capture_rate}`)
+      if (isCaught) {
+        setSnackbar({ isOpen: true, type: 'success', message: `${pokemon?.name} is captured` })
+        setIsModalOpen(true)
+      } else {
+        setSnackbar({ isOpen: true, type: 'error', message: `Failed to capture ${pokemon?.name}. Try again!` })
+      }     
+      setIsCatchingLoading(false) 
+    }, 1000)
   }
 
   const saveCaughtPokemon = () => {
@@ -138,7 +143,7 @@ export function PokemonDetail(): JSX.Element {
                       color="error"
                       variant="extended"
                       aria-label="Catch"
-                      sx={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: '20px', whiteSpace: 'nowrap'}}
+                      sx={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: '20px', whiteSpace: 'nowrap', minWidth: '250px'}}
                       onClick={catchPokemon}
                     >
                       {
@@ -147,9 +152,14 @@ export function PokemonDetail(): JSX.Element {
                           </div>
                         : null
                       }
-                      <div style={{ display: 'flex', zIndex: '1'}}>
-                        <CatchingPokemonIcon sx={{ mr: 1 }}/> Catch this Pokemon
-                      </div>
+                      {
+                        !isCatchingLoading ?
+                          <div style={{ display: 'flex', zIndex: '1'}}>
+                            <CatchingPokemonIcon sx={{ mr: 1 }}/> Catch this Pokemon
+                          </div>
+                        :
+                          <CircularProgress color="inherit" />
+                      }
                     </Fab>
                     
                     <Snackbar
