@@ -14,7 +14,7 @@ interface SnackbarState {
 
 export function PokemonDetail(): JSX.Element {
   const params = useParams()
-  let [searchParams, setSearchParams] = useSearchParams()
+  let [searchParams] = useSearchParams()
 
   // redux states
   const { pokemon, isLoading, error } = useAppSelector(state => state.pokemonDetail)
@@ -82,7 +82,7 @@ export function PokemonDetail(): JSX.Element {
     if (searchParams.has('isCatchable')) {
       setIsCatchable(searchParams.get('isCatchable') !== 'false')
     }
-  }, [pokemon])
+  }, [pokemon]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
       <Box sx={{
