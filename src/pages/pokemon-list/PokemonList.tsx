@@ -58,7 +58,7 @@ export function PokemonList(): JSX.Element {
                             }
                           }>
                             <Typography variant="h2" fontSize={16} textTransform="capitalize" fontWeight="bold">{ pokemon.name }</Typography>
-                            <Typography fontSize={14} fontWeight={500} color="text.secondary">Owned: { pokemon?.owned ? `<strong>${pokemon?.owned}</strong>` : 0 }</Typography>
+                            <Typography fontSize={14} fontWeight={500} color="text.secondary">Owned: { pokemon?.owned ? <strong>{pokemon?.owned}</strong> : 0 }</Typography>
                           </Paper>
                         </Link>
                       </Grid>

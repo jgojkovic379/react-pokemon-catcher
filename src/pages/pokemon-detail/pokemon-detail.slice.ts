@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Pokemon, PokemonSpecies } from "../../common/pokemon.model";
 import { AppThunk } from "../../redux/store";
+import { setPokemons, syncMyPokemonLocalStorage } from "../my-pokemon/my-pokemon.slice";
+import { updateOwnedPokemon } from "../pokemon-list/pokemon-list.slice";
 import PokemonDetailApi from "./pokemon-detail.api";
 
 interface PokemonDetailState {
@@ -57,15 +59,13 @@ export const getPokemon = (name: string): AppThunk => dispatch => {
     })
 }
 
-export const catchPokemon = (): AppThunk => (dispatch, getStates) => {
-  
-  const existedCatchedPokemonStorage = localStorage.getItem('catchedPokemons')
-  let catchedPokemons: Array<Pokemon | null> = []
-  if(existedCatchedPokemonStorage) {
-    catchedPokemons = JSON.parse(existedCatchedPokemonStorage)
-  }
-  catchedPokemons.push(getStates().pokemonDetail.pokemon)
-  localStorage.setItem('catchedPokemons', JSON.stringify(catchedPokemons))
+export const saveToMyPokemon = (pokemon: Pokemon): AppThunk => (dispatch, getStates) => {
+  dispatch(syncMyPokemonLocalStorage())
+  const myPokemons: Array<Pokemon> = JSON.parse(JSON.stringify(getStates().myPokemon.pokemons))
+
+  myPokemons.push(pokemon)
+  dispatch(setPokemons(myPokemons))  
+  dispatch(updateOwnedPokemon(pokemon))
 }
 
 export default slice.reducer

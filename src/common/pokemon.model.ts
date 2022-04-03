@@ -15,7 +15,8 @@ export interface Pokemon {
   sprites: PokemonSprites,
   stats: PokemonStat[],
   types: PokemonType[],
-  owned?: number
+  owned?: number,
+  nickname?: string
 }
 
 export interface PokemonSummary {

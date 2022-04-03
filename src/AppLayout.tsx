@@ -2,7 +2,6 @@ import React from 'react';
 import { NavLink, useLocation } from "react-router-dom";
 import { ThemeProvider, createTheme, Container, Grid, Box, Tab, Breakpoint, Typography } from '@mui/material'
 import CssBaseline from "@mui/material/CssBaseline";
-import HomeIcon from '@mui/icons-material/Home'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import PetsIcon from '@mui/icons-material/Pets'
 import { useAppSelector } from './redux/hooks'
@@ -38,9 +37,9 @@ export default function AppLayout({ children }: AppLayoutProps): JSX.Element {
     })
 
   React.useEffect(() => {
-    setContainerWidth((window.innerWidth > 768) ? 'md' : 'xs')
+    setContainerWidth((window.innerWidth > 500) ? 'md' : 'xs')
     function handleResize() {
-      setContainerWidth((window.innerWidth > 768) ? 'md' : 'xs')
+      setContainerWidth((window.innerWidth > 500) ? 'md' : 'xs')
     }
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -80,7 +79,7 @@ export default function AppLayout({ children }: AppLayoutProps): JSX.Element {
                   <Typography variant="h3" fontSize={20} fontWeight="bold">{title}</Typography>
                 :
                   <NavLink to="/">
-                    <HomeIcon sx={{ color: 'text.secondary' }} />
+                    <TravelExploreIcon sx={{ color: 'text.secondary' }} />
                   </NavLink>
               }
             </Grid>

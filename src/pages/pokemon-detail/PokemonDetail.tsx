@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { setHasMenu, setTitle } from '../../app-layout.slice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { getPokemon, setError } from './pokemon-detail.slice';
-import { Box, CircularProgress, Table, TableBody, TableCell, TableRow, Typography, Fab, Snackbar, Alert, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
+import { getPokemon, saveToMyPokemon, setError } from './pokemon-detail.slice';
+import { Box, CircularProgress, Table, TableBody, TableCell, TableRow, Typography, Fab, Snackbar, Alert, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, DialogContentText } from '@mui/material';
 import CatchingPokemonIcon from '@mui/icons-material/CatchingPokemon';
 
 interface SnackbarState {
@@ -14,8 +14,7 @@ interface SnackbarState {
 
 export function PokemonDetail(): JSX.Element {
   const params = useParams()
-  // const location = useLocation()
-  // const theme = useTheme()
+  let [searchParams, setSearchParams] = useSearchParams()
 
   // redux states
   const { pokemon, isLoading, error } = useAppSelector(state => state.pokemonDetail)
@@ -34,21 +33,29 @@ export function PokemonDetail(): JSX.Element {
   const [snackbar, setSnackbar] = React.useState<SnackbarState>({ isOpen: false, type: 'info', message: ''})
   const [isCatchable, setIsCatchable] = React.useState<boolean>(true)
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false)
+  const [pokemonNickname, setPokemonNickname] = React.useState<string>('')
 
   const catchPokemon = () => {
     // 255 is the capture rate number. see https://pokeapi.co/docs/v2#pokemon-species
     // if the capture rate doesn't exist, the capture rate value set to 127.5 (50%)
     const catchNumber = Math.floor(Math.random() * 255)
-    const isCatched = catchNumber <= (pokemon?.species?.capture_rate || 127.5)
-    console.log('capture rate', `${pokemon?.species?.capture_rate} / 255` )
-    console.log('catch number', catchNumber)
-    console.log(`Pokemon will be captured if catch number <= ${pokemon?.species?.capture_rate}`)
-    if (isCatched) {
+    const isCaught = catchNumber <= (pokemon?.species?.capture_rate || 127.5)
+    console.log(`Capture rate: ${pokemon?.species?.capture_rate} / 255 \nCatch number: ${catchNumber} \nPokemon will be captured if catch number <= ${pokemon?.species?.capture_rate}`)
+    if (isCaught) {
       setSnackbar({ isOpen: true, type: 'success', message: `${pokemon?.name} is captured` })
       setIsModalOpen(true)
     } else {
       setSnackbar({ isOpen: true, type: 'error', message: `Failed to capture ${pokemon?.name}. Try again!` })
     }
+  }
+
+  const saveCaughtPokemon = () => {
+    const nicknamedPokemon = JSON.parse(JSON.stringify(pokemon));
+    nicknamedPokemon.nickname = pokemonNickname
+    dispatch(saveToMyPokemon(nicknamedPokemon))
+    setSnackbar({ isOpen: true, type: 'success', message: `${pokemon?.name} is saved to My Pokemon collection` })
+    setIsModalOpen(false)
+    setIsCatchable(false)
   }
 
   const closeSnackbar = (event: any, reason: string = '') => {
@@ -57,6 +64,20 @@ export function PokemonDetail(): JSX.Element {
     }
     setSnackbar({ isOpen: false, type: 'info', message: ''})
   }
+
+  const closeModal = (event: any, reason: string = '') => {
+    if (reason === 'backdropClick') {
+      return;
+    }
+    setIsModalOpen(false)
+  }
+
+  React.useEffect(() => {
+    setPokemonNickname(pokemon ? pokemon?.name + Math.floor(Math.random() * 100) : '')
+    if (searchParams.has('isCatchable')) {
+      setIsCatchable(searchParams.get('isCatchable') !== 'false')
+    }
+  }, [pokemon])
 
   return (
       <Box sx={{
@@ -111,19 +132,25 @@ export function PokemonDetail(): JSX.Element {
                         </TableBody>
                       </Table>
                     </Box>
-                    {
-                      isCatchable ?
-                        <Fab 
-                          color="error"
-                          variant="extended"
-                          aria-label="Catch"
-                          sx={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: '20px', whiteSpace: 'nowrap'}}
-                          onClick={catchPokemon}
-                        >
-                          <CatchingPokemonIcon sx={{ mr: 1 }}/> Catch this Pokemon
-                        </Fab>
-                      : null
-                    }
+
+                    <Fab 
+                      disabled={!isCatchable}
+                      color="error"
+                      variant="extended"
+                      aria-label="Catch"
+                      sx={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', bottom: '20px', whiteSpace: 'nowrap'}}
+                      onClick={catchPokemon}
+                    >
+                      {
+                        !isCatchable ?
+                          <div style={{ position: 'absolute', left: 0, bottom: 0, right: 0, top: 0, background: '#eee', zIndex: '0', borderRadius: '30px'}}>
+                          </div>
+                        : null
+                      }
+                      <div style={{ display: 'flex', zIndex: '1'}}>
+                        <CatchingPokemonIcon sx={{ mr: 1 }}/> Catch this Pokemon
+                      </div>
+                    </Fab>
                     
                     <Snackbar
                       open={snackbar.isOpen}
@@ -142,18 +169,33 @@ export function PokemonDetail(): JSX.Element {
                       <Dialog
                         // fullScreen={true}
                         open={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
+                        onClose={closeModal}
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                         sx={{width: '100%'}}
+                        PaperProps={{ style: { margin: '15px'} }}
                         >
-                          <DialogTitle>asdasd</DialogTitle>
+                          <DialogTitle>Add to My Pokemon</DialogTitle>
                           <DialogContent>
-                            <TextField sx={{width: '100%'}}></TextField>
+                            <DialogContentText>
+                              Please give a nickname for your pokemon before adding it to your collection. You can also release it again.
+                            </DialogContentText>
+                            <TextField
+                              required
+                              autoFocus
+                              margin="dense"
+                              id="nickname"
+                              label="Nickname"
+                              type="text"
+                              value={pokemonNickname}
+                              onChange={(e) => setPokemonNickname(e.target.value)}
+                              fullWidth
+                              variant="standard"
+                            />
                           </DialogContent>
                           <DialogActions>
-                            <Button variant="outlined">Release</Button>
-                            <Button variant="contained">Save to Pokedex</Button>
+                            <Button color="error" onClick={closeModal}>Release & Close</Button>
+                            <Button onClick={saveCaughtPokemon}>Save</Button>
                           </DialogActions>
                       </Dialog>
                   </Box>
